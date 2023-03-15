@@ -96,12 +96,64 @@ app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
         console.log('Produto ' + line.slice(26,56));
         console.log('Valor ' + line.slice(56,66));
         console.log('Vendedor ' + line.slice(66,86));
-    });
 
-    const trasactionType = multerText.indexOf()
-    const result = {
-      fileText: multerText
-    };
-  
-    res.send(result);
+        connection.query('INSERT INTO sales_transactions VALUE(0,\'' + line.slice(0,1) + '\',\'' +line.slice(1,26) +'\',\''+ line.slice(26,56) +'\',\''+line.slice(56,66)+'\',\''+line.slice(66,86)+'\');', function (error, results) {
+            if (error) {
+               throw error
+         };
+    });
+});
+
+connection.query('SELECT * FROM sales_transactions', function (error, results) {
+    if (error) { 
+       throw error
+ };
+ const rsSales = results.map(item => ({ 
+     id: item.id, 
+     type: item.type,
+     datetime: item.datetime,
+     product: item.product,
+     value: item.value,
+     seller: item.seller
+  }));
+  const result = {
+    results: rsSales
+  };
+
+  res.send(result);
+});
+
+    // | Campo    | Início | Fim | Tamanho | Descrição                      |
+    // | -------- | ------ | --- | ------- | ------------------------------ |
+    // | Tipo     | 1      | 1   | 1       | Tipo da transação              |
+    // | Data     | 2      | 26  | 25      | Data - ISO Date + GMT          |
+    // | Produto  | 27     | 56  | 30      | Descrição do produto           |
+    // | Valor    | 57     | 66  | 10      | Valor da transação em centavos |
+    // | Vendedor | 67     | 86  | 20      | Nome do vendedor               |
+    
+
   });
+
+  app.get('/sales', function(req, res) {
+    connection.query('SELECT * FROM sales_transactions', function (error, results) {
+       if (error) { 
+          throw error
+    };
+    res.send(results.map(item => ({ 
+        id: item.id, 
+        type: item.type,
+        datetime: item.datetime,
+        product: item.product,
+        value: item.value,
+        seller: item.seller
+     })));
+   });
+ });
+
+ app.get('/clean', function(req, res) {
+    connection.query('DELETE FROM sales_transactions', function (error, results) {
+       if (error) { 
+          throw error
+    };
+});
+ });
