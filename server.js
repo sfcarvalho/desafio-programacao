@@ -6,16 +6,6 @@ var readline = require('readline');
 var stream = require('stream');
 const app = express();
 
-// var storage =   multer.diskStorage({  
-//     destination: function (req, file, callback) {  
-//       callback(null, './uploads');  
-//     },  
-//     filename: function (req, file, callback) {  
-//       callback(null, file.originalname);  
-//     }  
-//   });  
-
-// var upload = multer({ storage : storage}).single('myfile'); 
 
 const storage = multer.memoryStorage();
 const fileFilter = (req, file, cb) => {
@@ -78,8 +68,7 @@ app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
       return next(error);
     }
     const multerText = Buffer.from(file.buffer).toString("utf-8");
-    var baseText = 'this is a sample text\n(empty lines ...)\n\n\n\nend linerrrr:)';
-    // var buf = Buffer(baseText);
+
     var buf = Buffer(multerText);
     var bufferStream = new stream.PassThrough();
     bufferStream.end(buf);
@@ -96,13 +85,18 @@ app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
         console.log('Produto ' + line.slice(26,56));
         console.log('Valor ' + line.slice(56,66));
         console.log('Vendedor ' + line.slice(66,86));
+        var transaction = line.slice(0,1);
+        var data = line.slice(1,26);
+        var product = line.slice(26,56).replace(/\s+/g, ' ').trim();
+        var amount = parseInt(line.slice(56,66)).toFixed(2);
+        var seller = line.slice(66,86);
 
-        connection.query('INSERT INTO sales_transactions VALUE(0,\'' + line.slice(0,1) + '\',\'' +line.slice(1,26) +'\',\''+ line.slice(26,56) +'\',\''+line.slice(56,66)+'\',\''+line.slice(66,86)+'\');', function (error, results) {
+        connection.query('INSERT INTO sales_transactions VALUE(0,\'' + transaction + '\',\'' +data +'\',\''+ product +'\',\''+amount+'\',\''+seller+'\');', function (error, results) {
             if (error) {
                throw error
          };
+        });
     });
-});
 
 connection.query('SELECT * FROM sales_transactions', function (error, results) {
     if (error) { 
@@ -122,15 +116,6 @@ connection.query('SELECT * FROM sales_transactions', function (error, results) {
 
   res.send(result);
 });
-
-    // | Campo    | Início | Fim | Tamanho | Descrição                      |
-    // | -------- | ------ | --- | ------- | ------------------------------ |
-    // | Tipo     | 1      | 1   | 1       | Tipo da transação              |
-    // | Data     | 2      | 26  | 25      | Data - ISO Date + GMT          |
-    // | Produto  | 27     | 56  | 30      | Descrição do produto           |
-    // | Valor    | 57     | 66  | 10      | Valor da transação em centavos |
-    // | Vendedor | 67     | 86  | 20      | Nome do vendedor               |
-    
 
   });
 
