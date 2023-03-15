@@ -1,18 +1,32 @@
 const express = require('express');
-var multer  =   require('multer');  
+const multer  =   require('multer');
+const path = require("path");
 const mysql = require('mysql');
 const app = express();
 
-var storage =   multer.diskStorage({  
-    destination: function (req, file, callback) {  
-      callback(null, './uploads');  
-    },  
-    filename: function (req, file, callback) {  
-      callback(null, file.originalname);  
-    }  
-  });  
+// var storage =   multer.diskStorage({  
+//     destination: function (req, file, callback) {  
+//       callback(null, './uploads');  
+//     },  
+//     filename: function (req, file, callback) {  
+//       callback(null, file.originalname);  
+//     }  
+//   });  
 
-var upload = multer({ storage : storage}).single('myfile');  
+// var upload = multer({ storage : storage}).single('myfile'); 
+
+const storage = multer.memoryStorage();
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype == 'text/plain') { // checking the MIME type of the uploaded file
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
+const upload = multer({
+    fileFilter,
+    storage
+});
 
 const connection = mysql.createConnection({
   host: 'mysql-container',
@@ -52,3 +66,20 @@ app.post('/uploadjavatpoint',function(req,res){
 app.listen(3000, function() {
     console.log('Listening on port 3000');
 })
+
+app.post("/uploadFile", upload.single("myFile"), (req, res, next) => { 
+    const file = req.file;
+  
+    if (!file) {
+      const error = new Error("Please upload a file");
+      error.httpStatusCode = 400;
+      return next(error);
+    }
+    const multerText = Buffer.from(file.buffer).toString("utf-8");
+  
+    const result = {
+      fileText: multerText
+    };
+  
+    res.send(result);
+  });
