@@ -2,6 +2,8 @@ const express = require('express');
 const multer  =   require('multer');
 const path = require("path");
 const mysql = require('mysql');
+var readline = require('readline');
+var stream = require('stream');
 const app = express();
 
 // var storage =   multer.diskStorage({  
@@ -76,7 +78,27 @@ app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
       return next(error);
     }
     const multerText = Buffer.from(file.buffer).toString("utf-8");
-  
+    var baseText = 'this is a sample text\n(empty lines ...)\n\n\n\nend linerrrr:)';
+    // var buf = Buffer(baseText);
+    var buf = Buffer(multerText);
+    var bufferStream = new stream.PassThrough();
+    bufferStream.end(buf);
+
+    var rl = readline.createInterface({
+        input: bufferStream,
+    });
+
+    var count = 0;
+    rl.on('line', function (line) {
+        console.log('Linha ' + (++count) + ' valor = ' + line);
+        console.log('Transacao ' + line.slice(0,1));
+        console.log('Data ' + line.slice(1,26));
+        console.log('Produto ' + line.slice(26,56));
+        console.log('Valor ' + line.slice(56,66));
+        console.log('Vendedor ' + line.slice(66,86));
+    });
+
+    const trasactionType = multerText.indexOf()
     const result = {
       fileText: multerText
     };
