@@ -58,13 +58,50 @@ app.listen(3000, function () {
 })
 
 app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
-    const file = req.file;
-
-    if (!file) {
+    
+    if(!req.file){
+        console.log("Vazio")
         const error = new Error("Please upload a file");
         error.httpStatusCode = 400;
+        res.send("Nenhum arquivo selecionado.")
         return next(error);
+         
     }
+    const file = req.file;
+
+    // console.log("Tamanho")
+    // console.log(file.size)
+    // console.log("Mimetype")
+    // console.log(file.mimetype)
+
+    if (file.size = 0) {
+        const error = new Error("Please upload a file");
+        error.httpStatusCode = 400;
+        next(error);
+        return res.send("Nenhum arquivo selecionado.")
+    } else {
+        const fileType = req.file.mimetype;
+        const fileSize = req.file.size;
+    
+        console.log(fileType)
+        console.log(fileSize)
+    
+        if( fileType !== "text/plain"){
+            const error = new Error("Non text file");
+            error.httpStatusCode = 400;
+            res.send("Formato incorreto de Arquivo.");
+        }
+    
+        if( fileSize > "16000"){
+            const error = new Error("Larger file");
+            error.httpStatusCode = 400;
+            res.send("Arquivo maior que 1MB.");
+        }
+    }
+
+
+    
+
 
     // Create a buffer from the file using multer
     const multerText = Buffer.from(file.buffer).toString("utf-8");
@@ -109,6 +146,7 @@ app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
                 value: item.value,
                 seller: item.seller
             }));
+            rsSells.push(count+" Registros importados.")
             // Sending to grid
             res.send(rsSells);
         });
