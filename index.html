@@ -85,19 +85,17 @@
         <br>
         <div class="jumbotron"><br>
             <h1 class="display-4">Gerenciamento de Vendas</h1>
-            <p class="lead">Por favor envie seu arquivo de vendas</p>
+            <p class="lead">Envio de Arquivo de Vendas</p>
             <hr class="my-4">
-            <p class="lead">Para visualizar saldo de vendas acesse <a href="/salesreport">aqui</a> </p>
+            <p class="p-3 mb-2 bg-light text-dark">Para visualizar saldo de vendas acesse <a href="/salesreport">aqui</a> </p>
+            <br>
             <form action="uploadFile" id="uploadForm" name="uploadForm">
                 <div class="form-group">
-                    <label for="myFile"></label>
+                    <label for="myFile"><p> Selecione o arquivo :  </p></label>
+                    <input type="file" name="myFile" accept=".txt" class="form-control" placeholder="Selecionar">
                 </div>
-                <input type="file" name="myFile" accept=".txt" class="form-control" placeholder="Selecionar">
                 <br /><br />
-                <!-- <input type="submit" value="Processar Arquivo" /> -->
                 <p class="lead">
-                    <!-- <a class="btn btn-primary btn-lg" href="#" role="button" id="btnUpload" name="submit"
-                    type="submit">Carregar Arquivo</a> -->
                     <input class="btn btn-primary btn-lg" type="submit" value="Carregar Arquivo">
                 </p>
                 <span id="status"></span>
