@@ -60,20 +60,14 @@ app.listen(3000, function () {
 app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
     
     if(!req.file){
-        console.log("Vazio")
         const error = new Error("Please upload a file");
         error.httpStatusCode = 400;
-        res.send("Nenhum arquivo selecionado.")
         return next(error);
-         
     }
+
     const file = req.file;
 
-    // console.log("Tamanho")
-    // console.log(file.size)
-    // console.log("Mimetype")
-    // console.log(file.mimetype)
-
+    // Backend validators
     if (file.size = 0) {
         const error = new Error("Please upload a file");
         error.httpStatusCode = 400;
@@ -82,26 +76,16 @@ app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
     } else {
         const fileType = req.file.mimetype;
         const fileSize = req.file.size;
-    
-        console.log(fileType)
-        console.log(fileSize)
-    
         if( fileType !== "text/plain"){
             const error = new Error("Non text file");
             error.httpStatusCode = 400;
-            res.send("Formato incorreto de Arquivo.");
         }
     
         if( fileSize > "16000"){
             const error = new Error("Larger file");
             error.httpStatusCode = 400;
-            res.send("Arquivo maior que 1MB.");
         }
     }
-
-
-    
-
 
     // Create a buffer from the file using multer
     const multerText = Buffer.from(file.buffer).toString("utf-8");
@@ -153,7 +137,7 @@ app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
     })
 });
 
-app.get('/sales', function (req, res) {
+app.get('/salesreport', function (req, res) {
     connection.query('select seller as Vendedor,sum(Case when value > 0 then value else 0 end) as Saldo_Produtor,  Sum(Case when value < 0 then value else 0 end) as Comissoes, (Sum(Case when value > 0 then value else 0 end))+(Sum(Case when value < 0 then value else 0 end)) as Valor_Ganho  from sales_transactions group by seller', function (error, results) {
         if (error) {
             throw error
