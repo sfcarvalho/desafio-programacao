@@ -138,6 +138,11 @@ app.post("/uploadFile", upload.single("myFile"), (req, res, next) => {
 });
 
 app.get('/salesreport', function (req, res) {
+    res.sendFile(__dirname + "/salesreport.html");
+});
+
+app.post('/sales', function (req, res) {
+    
     connection.query('select seller as Vendedor,sum(Case when value > 0 then value else 0 end) as Saldo_Produtor,  Sum(Case when value < 0 then value else 0 end) as Comissoes, (Sum(Case when value > 0 then value else 0 end))+(Sum(Case when value < 0 then value else 0 end)) as Valor_Ganho  from sales_transactions group by seller', function (error, results) {
         if (error) {
             throw error
